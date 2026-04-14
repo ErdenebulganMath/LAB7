@@ -2,6 +2,9 @@
 #include<cmath>
 using namespace std ; 
 
+
+
+
 struct Point{
     float x;
     float y;
