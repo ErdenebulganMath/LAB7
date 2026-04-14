@@ -1,99 +1,162 @@
 #include<bits/stdc++.h>
-#include<cmath>
+#include<math.h>
 using namespace std ; 
-
-
-
-
+ 
 struct Point{
     float x;
     float y;
-
-} typedef Point ;
-
+} typedef Point ;   
+ 
+// Shape эх класс - байгуулагч нэмлээ
 class Shape{
     protected :
         Point points[100];
+    public :
+        Shape(){
+        }
+        virtual ~Shape(){
+        }
 } ; 
-
+ 
+// Shape2D эх класс - параметертэй байгуулагч нэмлээ
 class Shape2D : public Shape{
     protected : 
         string name;
     public :
-        Shape2D(string name){
-            this->name = name ; 
+        // Параметертэй байгуулагч - эх классын Shape() дуудна
+        Shape2D(string n) : Shape() {
+            name = n;
         }
-
         virtual float talbai() = 0 ;
         virtual float perimetr() = 0 ; 
+        string getName(){
+            return name ; 
+        }
+        virtual ~Shape2D(){}
 } ; 
-
+ 
+// Circle
 class Circle : public Shape2D{
     protected : 
         Point p1 ; 
         float radius ;  
-
     public :
-        Circle(Point p1 , float radius) : Shape2D("Circle"){
+        // Shape2D-ийн параметертэй байгуулагчийг дуудаж байна
+        Circle(Point p1 , float radius , string name) : Shape2D(name) {
             this->p1 = p1 ; 
             this->radius = radius ; 
         }
-
         float talbai() override {
             return 3.14 * radius * radius ; 
         }
-
         float perimetr() override {
             return 2 * 3.14 * radius ; 
         }
+        ~Circle(){}
 } ; 
-
+ 
+// Square
 class Square : public Shape2D{
     protected :
         Point p1 , p2 , p3 , p4 ; 
         float tal ; 
     public :
-        Square(Point p1 , Point p2 , Point p3 , Point p4 , float tal) : Shape2D("Square"){
-            this->p1 = p1 ; 
-            this->p2 = p2 ; 
-            this->p3 = p3 ; 
-            this->p4 = p4 ; 
-            this->tal = tal ;
+        // Shape2D-ийн параметертэй байгуулагчийг дуудаж байна
+        Square(Point topLeft, float length, string n) : Shape2D(n) {
+            p1 = topLeft;
+            p2 = {topLeft.x + length, topLeft.y};
+            p3 = {topLeft.x + length, topLeft.y - length};
+            p4 = {topLeft.x, topLeft.y - length};
+            tal = length;
         }
-
         float talbai() override {
             return tal * tal ; 
         }
-
         float perimetr() override {
             return 4 * tal ; 
         }
-} ; 
-
-class Triangle : public Shape2D{
-    protected : 
-        Point p1 , p2 , p3 ; 
-        float tal1 , tal2 , tal3 ; 
-    public :
-        Triangle(Point p1 , Point p2 , Point p3 , float tal1 , float tal2 , float tal3) : Shape2D("Triangle"){
-            this->p1 = p1 ; 
-            this->p2 = p2 ; 
-            this->p3 = p3 ; 
-            this->tal1 = tal1 ; 
-            this->tal2 = tal2 ; 
-            this->tal3 = tal3 ; 
+        ~Square(){}
+};
+ 
+// Triangle
+class Triangle : public Shape2D {
+protected:
+    Point p1, p2, p3;
+    float tal1, tal2, tal3;
+public:
+    // Shape2D-ийн параметертэй байгуулагчийг дуудаж байна
+    Triangle(Point top, float a, string n) : Shape2D(n) {
+        p1 = top; 
+        float height = sqrt(3)/2 * a;
+        p2 = {top.x - a/2, top.y - height}; 
+        p3 = {top.x + a/2, top.y - height}; 
+    
+        tal1 = tal2 = tal3 = a;
+    }
+    float talbai() override {
+        return (sqrt(3)/4) * tal1 * tal1; 
+    }
+    float perimetr() override {
+        return tal1 + tal2 + tal3; 
+    }
+    ~Triangle(){}
+};
+ 
+void bubbleSort(vector<Shape2D*>& shapes) {
+    int n = shapes.size();
+    for(int i = 0; i < n-1; i++) {
+        for(int j = 0; j < n-i-1; j++) {
+            if(shapes[j]->talbai() > shapes[j+1]->talbai()) {
+                swap(shapes[j], shapes[j+1]);
+            }
         }
+    }
+}
+ 
+int main() {
 
-        float talbai() override {
-            float a = (tal1 + tal2 + tal3)/2 ; 
-            return sqrt(a * (a-tal1) * (a-tal2) * (a-tal3)) ; 
+// Олон объект үүсгэх (vector ашиглахгүй)
+int n ;
+cin >> n ; 
+
+// dynamic array үүсгэнэ
+Shape2D** shapes = new Shape2D*[n];
+
+shapes[0] = new Circle({0,0}, 5, "Circle1");
+shapes[1] = new Square({0,10}, 4, "Square1");
+shapes[2] = new Triangle({0,10}, 6, "Triangle1");
+shapes[3] = new Circle({1,1}, 3, "Circle2");
+shapes[4] = new Square({2,8}, 2, "Square2");
+shapes[5] = new Triangle({2,5}, 4, "Triangle2");
+
+
+// ===== ЭРЭМБЭЛЭХ (bubble sort) =====
+for(int i = 0; i < n - 1; i++){
+    for(int j = 0; j < n - i - 1; j++){
+        if(shapes[j]->talbai() > shapes[j + 1]->talbai()){
+            swap(shapes[j], shapes[j + 1]);
         }
-
-        float perimetr() override {
-            return (tal1 + tal2 + tal3) ; 
-        }
-} ;
+    }
+}
 
 
+// ===== Хэвлэх =====
+cout << "=== Sorted by area ===\n\n";
+
+for(int i = 0; i < n; i++){
+    cout << shapes[i]->getName() << endl;
+    cout << "Talbai: " << shapes[i]->talbai() << endl;
+    cout << "Perimetr: " << shapes[i]->perimetr() << endl;
+    cout << "------------------" << endl;
+}
 
 
+// ===== Memory цэвэрлэх =====
+for(int i = 0; i < n; i++){
+    delete shapes[i];
+}
+
+delete[] shapes;
+
+
+}
