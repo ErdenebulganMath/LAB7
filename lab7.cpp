@@ -102,17 +102,15 @@ public:
     ~Triangle(){}
 };
  
-void bubbleSort(vector<Shape2D*>& shapes) {
-    int n = shapes.size();
-    for(int i = 0; i < n-1; i++) {
-        for(int j = 0; j < n-i-1; j++) {
-            if(shapes[j]->talbai() > shapes[j+1]->talbai()) {
-                swap(shapes[j], shapes[j+1]);
+void bubbleSort(Shape2D** shapes, int n) {
+    for(int i = 0; i < n - 1; i++) {
+        for(int j = 0; j < n - i - 1; j++) {
+            if(shapes[j]->talbai() > shapes[j + 1]->talbai()) {
+                swap(shapes[j], shapes[j + 1]);
             }
         }
     }
 }
- 
 int main() {
 
 // Олон объект үүсгэх (vector ашиглахгүй)
